@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom'
+import { NavLink, Outlet } from 'react-router-dom'
 import { HeroIcons } from '../util/hero-icons'
 import logo from '../util/logo.png'
 
@@ -10,15 +10,21 @@ export const RootLayout = () => {
           <img src={logo} height={3} />
 
           <div className="flex justify-between gap-5">
-            <button className="flex gap-1 hover:bg-gray-200 p-2 rounded-xl font-semibold">
+            <NavLink
+              to="/"
+              className="flex gap-1 hover:bg-gray-200 p-2 rounded-xl font-semibold"
+            >
               <HeroIcons name="HomeIcon" className="h-6 w-6 " stroke={2} />
               <h1>Home</h1>
-            </button>
+            </NavLink>
 
-            <button className="flex gap-1 hover:bg-gray-200 p-2 rounded-xl font-semibold">
+            <NavLink
+              to="calendar"
+              className="flex gap-1 hover:bg-gray-200 p-2 rounded-xl font-semibold"
+            >
               <HeroIcons name="CalendarIcon" className="h-6 w-6" stroke={2} />
               <h1>Calendar</h1>
-            </button>
+            </NavLink>
           </div>
 
           <HeroIcons name="UserCircleIcon" className="w-12" />

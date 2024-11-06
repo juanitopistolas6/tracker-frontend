@@ -5,7 +5,8 @@ import {
   RouterProvider,
 } from 'react-router-dom'
 import { RootLayout } from './layouts/root-layout'
-import { HomePage } from './components/home'
+import { HomePage } from './pages/home'
+import { Calendar } from './pages/calendar'
 
 function App() {
   const routes = createBrowserRouter(
@@ -13,6 +14,7 @@ function App() {
       <>
         <Route path="/" element={<RootLayout />}>
           <Route index element={<HomePage />} />
+          <Route path="calendar" element={<Calendar />} />
         </Route>
       </>
     )

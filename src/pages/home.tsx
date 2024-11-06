@@ -1,4 +1,5 @@
 import { HeroIcons } from '../util/hero-icons'
+import { Expenses } from '../components/expenses'
 
 export const HomePage = () => {
   return (
@@ -8,13 +9,20 @@ export const HomePage = () => {
       </div>
 
       {/* Total info */}
-      <div className="flex justify-between">
+      <div className="flex justify-between gap-10">
         <div className="flex-col">
           <div className="font-bold text-sm">
             <h1 className="text-blue-600">Total</h1>
           </div>
 
           <div className="font-bold text-3xl">$219,000.00</div>
+        </div>
+
+        <div className="w-full flex items-end py-1">
+          <div className="w-full rounded-3xl border flex relative h-4 overflow-hidden">
+            <span className="w-1/3 bg-red-600"></span>
+            <span className="w-2/3 bg-green-600"></span>
+          </div>
         </div>
       </div>
 
@@ -61,12 +69,16 @@ export const HomePage = () => {
             <HeroIcons name="ChevronDownIcon" />
           </button>
 
-          <button className="flex gap-1 items-center h-auto text-white rounded-full bg-black px-3">
+          <button className="flex gap-1 items-center h-auto text-white rounded-full bg-black px-4">
             <HeroIcons name="PlusIcon" stroke={2} />
             <span>Add</span>
           </button>
         </div>
       </div>
+
+      {/* Expenses */}
+
+      <Expenses />
     </div>
   )
 }
