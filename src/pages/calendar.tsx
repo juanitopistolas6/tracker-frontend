@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
 import { HeroIcons } from '../util/hero-icons'
+import { CalendarSquare } from '../components/calendar-square'
+import { NullSquare } from '../components/null-square'
 
 export const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date())
-  const [selectedDate, setSelectedDate] = useState(null)
-  const [events, setEvents] = useState([])
 
   const handlePrevMonth = () => {
     setCurrentDate(
@@ -26,7 +26,7 @@ export const Calendar = () => {
     const firstDay = new Date(year, month, 1).getDay()
     const lastDate = new Date(year, month + 1, 0).getDate()
 
-    for (let i = 0; i < firstDay; i++) {
+    for (let i = 0; i < firstDay - 1; i++) {
       days.push(null)
     }
 
@@ -84,12 +84,16 @@ export const Calendar = () => {
       </div>
       <div className="border rounded-md h-auto grid grid-cols-7 overflow-hidden">
         {days.map((i) => {
-          if (i == null) return
+          if (!i) return <NullSquare />
 
           return (
-            <div className="h-36 border flex-col p-2">
-              <div className="font-bold">{i.getDate()}</div>
-            </div>
+            <CalendarSquare
+              date={i}
+              current={
+                currentDate.toLocaleDateString() == i.toLocaleDateString()
+              }
+              key={i.getDate()}
+            />
           )
         })}
       </div>

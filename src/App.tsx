@@ -7,6 +7,7 @@ import {
 import { RootLayout } from './layouts/root-layout'
 import { HomePage } from './pages/home'
 import { Calendar } from './pages/calendar'
+import { CalendarDaily } from './pages/calendar-daily'
 
 function App() {
   const routes = createBrowserRouter(
@@ -15,6 +16,7 @@ function App() {
         <Route path="/" element={<RootLayout />}>
           <Route index element={<HomePage />} />
           <Route path="calendar" element={<Calendar />} />
+          <Route path="calendar/:date" element={<CalendarDaily />} />
         </Route>
       </>
     )
