@@ -18,6 +18,8 @@ import { UseMutateFunction, useMutation, useQuery } from '@tanstack/react-query'
 interface IAuthValues {
   user: IUser | null
   isAuthenticated: boolean
+  loginSuccess: boolean
+  error: string | null
   login: UseMutateFunction<
     IResponse<ILoginResponse>,
     Error,
@@ -28,15 +30,16 @@ interface IAuthValues {
 
 const authContext = createContext<IAuthValues | null>(null)
 
-export function authProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const { axios } = useAxios()
   const [user, setUser] = useState<IUser | null>(null)
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const { mutate: login } = useMutation({
+  const { mutate: login, isSuccess: loginSuccess } = useMutation({
     mutationFn: async (payload: ILoginPayload) => {
       const response = await axios.post<IResponse<ILoginResponse>>(
-        '/auth',
+        '/auth/login',
         payload
       )
 
@@ -51,10 +54,12 @@ export function authProvider({ children }: { children: ReactNode }) {
 
       setAuthenticated(true)
     },
-    onError: () => {
+    onError: (error) => {
       setUser(null)
 
       setAuthenticated(false)
+
+      setError(error.message)
     },
   })
 
@@ -72,7 +77,6 @@ export function authProvider({ children }: { children: ReactNode }) {
     if (!isSuccess) return
 
     if (!token) {
-      console.log('no logeado')
       setUser(null)
       setAuthenticated(false)
       return
@@ -86,6 +90,8 @@ export function authProvider({ children }: { children: ReactNode }) {
     user,
     isAuthenticated,
     login,
+    error,
+    loginSuccess,
   }
 
   return <authContext.Provider value={values}>{children}</authContext.Provider>

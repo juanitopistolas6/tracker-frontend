@@ -8,3 +8,11 @@ export interface IExpense {
   expenseDate: Date
   authorId: string
 }
+
+export interface ICreateExpense {
+  description: string
+  amount: number
+  type: 'deposit' | 'saving' | 'expense'
+  status?: 'pending' | 'success'
+  expenseDate?: Date
+}

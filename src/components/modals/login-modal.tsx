@@ -1,6 +1,8 @@
 import { HeroIcons } from '../../util/hero-icons'
 import TextField from '@mui/material/TextField'
 import { useForm } from 'react-hook-form'
+import { useAuth } from '../../context/auth-context'
+import { useEffect } from 'react'
 
 interface loginProps {
   handleClose: () => void
@@ -11,9 +13,22 @@ interface form {
   password: string
 }
 
-export const LoginModal = (login: loginProps) => {
-  const { handleClose } = login
-  const { register } = useForm<form>()
+export const LoginModal = (loginProps: loginProps) => {
+  const { handleClose } = loginProps
+  const { login, loginSuccess, error } = useAuth()
+  const { register, handleSubmit, getValues } = useForm<form>()
+
+  useEffect(() => {
+    if (!loginSuccess) return
+
+    handleClose()
+  }, [loginSuccess])
+
+  function submit() {
+    const payload = getValues()
+
+    login(payload)
+  }
 
   return (
     <div className="w-[350px] rounded-xl p-2 space-y-5 flex-col h-auto relative bg-white">
@@ -23,7 +38,16 @@ export const LoginModal = (login: loginProps) => {
         </button>
       </div>
 
-      <form className="w-full flex-col flex px-8 space-y-2">
+      <form
+        className="w-full flex-col flex px-8 space-y-2"
+        onSubmit={handleSubmit(submit)}
+      >
+        {error && (
+          <span className="py-2 mb-2 bg-red-600 text-white text-center">
+            {error}
+          </span>
+        )}
+
         <TextField
           id="outlined-password-input"
           label="User"
