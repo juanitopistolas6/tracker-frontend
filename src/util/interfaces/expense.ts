@@ -12,7 +12,7 @@ export interface IExpense {
 export interface ICreateExpense {
   description: string
   amount: number
-  type: 'deposit' | 'saving' | 'expense'
+  type?: 'deposit' | 'saving' | 'expense'
   status?: 'pending' | 'success'
   expenseDate?: Date
 }

@@ -9,6 +9,7 @@ export type expensePayload =
   | { action: 'ADD_EXPENSE'; payload: IExpense }
   | { action: 'REMOVE_EXPENSE'; payload: IExpense }
   | { action: 'GET_EXPENSES'; payload: IExpense[] }
+  | { action: 'REPLACE_EXPENSE'; payload: IExpense }
   | { action: 'FETCH_ERROR' }
 
 export function expenseReducer(
@@ -32,6 +33,9 @@ export function expenseReducer(
           }
         : { expenses: action.payload, error: false }
     }
+    case 'REPLACE_EXPENSE': {
+      return replaceExpense(state, action.payload)
+    }
     case 'FETCH_ERROR': {
       return { ...state, error: true }
     }
@@ -39,6 +43,23 @@ export function expenseReducer(
       return state
     }
   }
+}
+
+function replaceExpense(
+  state: IExpenseState,
+  expense: IExpense
+): IExpenseState {
+  if (!state.expenses) return { ...state, error: true }
+
+  const expenseFound = state.expenses?.findIndex(
+    (item) => item.id === expense.id
+  )
+
+  if (!expenseFound) return { ...state, error: true }
+
+  state.expenses[expenseFound] = expense
+
+  return state
 }
 
 function manageExpense(
