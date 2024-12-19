@@ -27,6 +27,7 @@ interface IExpenseValues {
   expenseDate: IResponse<IExpense[]> | undefined
   hasNextPage: boolean
   expensesInterval: IResponse<IExpense[]> | undefined
+  createError: Error | null
   fetchNextPage: (
     options?: FetchNextPageOptions
   ) => Promise<
@@ -115,7 +116,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     },
   })
 
-  const { mutate: createExpense } = useMutation({
+  const { mutate: createExpense, error: createError } = useMutation({
     mutationFn: async (expense: ICreateExpense) => {
       const response = await axios.post<IResponse<IExpense>>(
         '/expense',
@@ -199,6 +200,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     hasNextPage,
     expenseDate,
     expensesInterval,
+    createError,
     editExpense,
     getExpensesInterval,
     getExpenseByDate,

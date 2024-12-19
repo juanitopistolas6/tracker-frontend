@@ -9,6 +9,7 @@ import { HeroIcons } from '../../util/hero-icons'
 import { Controller, useForm } from 'react-hook-form'
 import { useExpense } from '../../context/expenses-context'
 import { DateTimePicker } from '@/util/time-picker/date-time-picker'
+import { useEffect } from 'react'
 
 interface ExpenseProps {
   handleClose: () => void
@@ -37,9 +38,12 @@ export function ExpenseModal(props: ExpenseProps) {
     createExpense(data)
   }
 
-  const [date] = watch(['expenseDate'])
-
-  console.log(date)
+  useEffect(() => {
+    const { unsubscribe } = watch((value) => {
+      console.log(value)
+    })
+    return () => unsubscribe()
+  }, [watch])
 
   return (
     <div className="w-[500px] h-full bg-white rounded-xl p-3 space-y-5 flex-col">
@@ -96,12 +100,18 @@ export function ExpenseModal(props: ExpenseProps) {
           <Controller
             control={control}
             name="expenseDate"
-            render={({ field }) => <DateTimePicker />}
+            render={({ field: { value, onChange } }) => (
+              <DateTimePicker onChange={onChange} value={value} />
+            )}
           />
         </div>
 
         <div className="flex justify-between w-full">
-          <TextField label="Descripcion" className="w-full h-12" />
+          <TextField
+            label="Descripcion"
+            className="w-full h-12"
+            {...register('description')}
+          />
         </div>
 
         <div className="flex justify-center gap-7 w-full ">

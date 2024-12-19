@@ -70,7 +70,13 @@ function manageExpense(
   if (!state.expenses) return { ...state, error: true }
 
   if (action == 'ADD') {
-    return { expenses: [...state.expenses, { ...payload }], error: false }
+    return {
+      expenses: [{ ...payload }, ...state.expenses].sort(
+        (a, b) =>
+          new Date(a.expenseDate).getTime() + new Date(b.expenseDate).getTime()
+      ),
+      error: false,
+    }
   } else {
     const itemFound = state.expenses.find((item) => item.id === payload.id)
 
@@ -78,7 +84,11 @@ function manageExpense(
       ? {
           expenses: [
             ...state.expenses.filter((item) => item.id == itemFound.id),
-          ],
+          ].sort(
+            (a, b) =>
+              new Date(a.expenseDate).getTime() -
+              new Date(b.expenseDate).getTime()
+          ),
           error: false,
         }
       : { ...state, error: true }

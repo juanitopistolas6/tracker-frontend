@@ -24,7 +24,7 @@ export const ExpenseType = (expenseProps: IExpenseType) => {
 
   return (
     <div className="border-b-2 flex py-2 relative px-5">
-      <div className="flex gap-2 relative left-0">
+      <div className="flex gap-2 relative left-0 w-24">
         <HeroIcons
           name={icon.name}
           className={`h-6 w-6 ${icon.color}`}
@@ -35,7 +35,7 @@ export const ExpenseType = (expenseProps: IExpenseType) => {
 
       <span className="flex-grow text-center">{description}</span>
 
-      <span className="font-bold right-0">{`${type == 'expense' ? '-' : ''}$${amount}`}</span>
+      <span className="font-bold right-0 w-24 text-right">{`${type == 'expense' ? '-' : ''}$${amount}`}</span>
 
       <button className="absolute -right-10 rounded-full hover:bg-gray-200 my-auto flex items-center p-2 top-1/2 transform -translate-y-1/2">
         <HeroIcons

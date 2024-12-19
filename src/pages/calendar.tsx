@@ -2,8 +2,10 @@ import { useMemo, useState } from 'react'
 import { HeroIcons } from '../util/hero-icons'
 import { CalendarSquare } from '../components/calendar-square'
 import { NullSquare } from '../components/null-square'
+import { useExpense } from '@/context/expenses-context'
 
 export const Calendar = () => {
+  const { state } = useExpense()
   const [currentDate, setCurrentDate] = useState(new Date())
 
   const handlePrevMonth = () => {
@@ -25,17 +27,31 @@ export const Calendar = () => {
 
     const firstDay = new Date(year, month, 1).getDay()
     const lastDate = new Date(year, month + 1, 0).getDate()
+    const stateMonths = state.expenses?.filter((expense) => {
+      const currentMonth = new Date(expense.expenseDate).getMonth()
+
+      return currentMonth === month
+    })
 
     for (let i = 0; i < firstDay - 1; i++) {
       days.push(null)
     }
 
     for (let i = 1; i <= lastDate; i++) {
-      days.push(new Date(year, month, i))
+      const info = stateMonths?.filter((expense) => {
+        const currentDay = new Date(expense.expenseDate).getDate()
+
+        return currentDay === i
+      })
+
+      days.push({
+        date: new Date(year, month, i),
+        info,
+      })
     }
 
     return days
-  }, [currentDate])
+  }, [currentDate, state])
 
   return (
     <div className="flex-col w-full h-full space-y-5">
@@ -88,11 +104,12 @@ export const Calendar = () => {
 
           return (
             <CalendarSquare
-              date={i}
+              date={i.date}
+              info={i.info}
               current={
-                currentDate.toLocaleDateString() == i.toLocaleDateString()
+                currentDate.toLocaleDateString() == i.date.toLocaleDateString()
               }
-              key={i.getDate()}
+              key={i.date.getDate()}
             />
           )
         })}

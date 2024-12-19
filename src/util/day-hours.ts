@@ -1,4 +1,5 @@
 export const hoursArray = [
+  '12:00 AM',
   '1:00 AM',
   '2:00 AM',
   '3:00 AM',
@@ -23,5 +24,4 @@ export const hoursArray = [
   '9:00 PM',
   '10:00 PM',
   '11:00 PM',
-  '12:00 AM',
 ]

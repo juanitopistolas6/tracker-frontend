@@ -12,8 +12,18 @@ import {
 } from '@/components/ui/popover'
 import { TimePickerDemo } from './time-picker-demo'
 
-export function DateTimePicker() {
+export function DateTimePicker({
+  value,
+  onChange,
+}: {
+  value?: Date
+  onChange: (date: Date | undefined) => void
+}) {
   const [date, setDate] = React.useState<Date>()
+
+  React.useEffect(() => {
+    setDate(value) // Sincronizar el estado interno cuando `value` cambia desde fuera
+  }, [value])
 
   /**
    * carry over the current time when a user clicks a new day
@@ -22,7 +32,9 @@ export function DateTimePicker() {
   const handleSelect = (newDay: Date | undefined) => {
     if (!newDay) return
     if (!date) {
+      onChange(newDay)
       setDate(newDay)
+
       return
     }
     const diff = newDay.getTime() - date.getTime()
@@ -37,7 +49,7 @@ export function DateTimePicker() {
         <Button
           variant={'outline'}
           className={cn(
-            'w-full justify-start text-left h-14 font-normal',
+            'w-full justify-start text-left h-14 font-normal ',
             !date && 'text-muted-foreground'
           )}
         >
@@ -53,7 +65,13 @@ export function DateTimePicker() {
           initialFocus
         />
         <div className="p-3 border-t border-border">
-          <TimePickerDemo setDate={setDate} date={date} />
+          <TimePickerDemo
+            setDate={(newDate) => {
+              setDate(newDate)
+              onChange(newDate)
+            }}
+            date={date}
+          />
         </div>
       </PopoverContent>
     </Popover>
