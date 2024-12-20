@@ -14,10 +14,17 @@ import {
   ReactNode,
   useContext,
   useEffect,
+  useMemo,
   useReducer,
+  useState,
 } from 'react'
 import { useAxios } from '../hooks/useAxios'
-import { ICreateExpense, IExpense, IResponse } from '../util/interfaces'
+import {
+  ICreateExpense,
+  IExpense,
+  IFilter,
+  IResponse,
+} from '../util/interfaces'
 import { IExpensePaginated } from '../util/interfaces/expense-paginated'
 import { expenseReducer, IExpenseState } from '../hooks/expense-reducer'
 import { useAuth } from './auth-context'
@@ -28,6 +35,7 @@ interface IExpenseValues {
   hasNextPage: boolean
   expensesInterval: IResponse<IExpense[]> | undefined
   createError: Error | null
+  expenses: IExpense[] | null | undefined
   fetchNextPage: (
     options?: FetchNextPageOptions
   ) => Promise<
@@ -58,6 +66,7 @@ interface IExpenseValues {
     unknown
   >
   deleteExpense: UseMutateFunction<IResponse<IExpense>, Error, string, unknown>
+  setFilter: React.Dispatch<React.SetStateAction<IFilter>>
 }
 
 const expenseContext = createContext<IExpenseValues | null>(null)
@@ -65,6 +74,7 @@ const expenseContext = createContext<IExpenseValues | null>(null)
 export function ExpenseProvider({ children }: { children: ReactNode }) {
   const { axios } = useAxios()
   const { isAuthenticated } = useAuth()
+  const [filter, setFilter] = useState<IFilter>('todos')
   const [state, dispatch] = useReducer(expenseReducer, {
     expenses: [],
     error: false,
@@ -195,8 +205,15 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     })
   }, [data])
 
+  const expenses: IExpense[] | null | undefined = useMemo(() => {
+    if (filter === 'todos') return state.expenses
+
+    return state.expenses?.filter((expense) => expense.type === filter)
+  }, [filter, state])
+
   const values: IExpenseValues = {
     state,
+    expenses,
     hasNextPage,
     expenseDate,
     expensesInterval,
@@ -206,6 +223,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     getExpenseByDate,
     createExpense,
     fetchNextPage,
+    setFilter,
     deleteExpense,
   }
 

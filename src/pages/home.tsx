@@ -3,9 +3,25 @@ import { Expenses } from '../components/expenses'
 import { useModal } from '../hooks/useModal'
 import { ExpenseModal } from '../components/modals/expense-modal'
 import { Modal } from '../components/modals/modal'
+import { useAuth } from '@/context/auth-context'
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
+} from '@mui/material'
+import { useExpense } from '@/context/expenses-context'
+import { IFilter } from '@/util/interfaces'
 
 export const HomePage = () => {
   const { handleClose, handleOpen, open } = useModal()
+  const { user } = useAuth()
+  const { setFilter } = useExpense()
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setFilter(event.target.value as IFilter)
+  }
 
   return (
     <>
@@ -47,22 +63,31 @@ export const HomePage = () => {
               <span></span>
             </div>
 
-            <div className="text-3xl font-bold text-black">$100,000.00</div>
+            <div className="text-3xl font-bold text-black">{`$${user?.salary.toFixed(2)}`}</div>
           </div>
 
           <div className="flex flex-col items-start text-gray-800">
-            <div className="flex justify-between w-full text-sm font-semibold text-red-600">
-              <span>Expenses</span>
-              <span>73%</span>
+            <div className="flex justify-between w-full text-sm font-semibold text-stone-900-400">
+              <span>Balance</span>
+              <span>23%</span>
             </div>
 
-            <div className="text-3xl font-bold text-black">$87,600.34</div>
+            <div className="text-3xl font-bold text-black">{`$${user?.balance.toFixed(2)}`}</div>
           </div>
 
           <div className="flex flex-col items-start text-gray-800">
             <div className="flex justify-between w-full text-sm font-semibold text-yellow-400">
               <span>Savings</span>
               <span>23%</span>
+            </div>
+
+            <div className="text-3xl font-bold text-black">{`$${user?.savings.toFixed(2)}`}</div>
+          </div>
+
+          <div className="flex flex-col items-start text-gray-800">
+            <div className="flex justify-between w-full text-sm font-semibold text-red-600">
+              <span>Expenses</span>
+              <span>73%</span>
             </div>
 
             <div className="text-3xl font-bold text-black">$87,600.34</div>
@@ -77,17 +102,28 @@ export const HomePage = () => {
           </div>
 
           <div className="flex gap-4 h-auto">
-            <button className="flex gap-1 items-center rounded-xl px-3 hover:bg-gray-300">
-              <span>Type</span>
-              <HeroIcons name="ChevronDownIcon" />
-            </button>
+            <FormControl className="w-40">
+              <InputLabel id="demo-simple-select-label">Filtros</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                defaultValue="todos"
+                label="Filtros"
+                onChange={handleChange}
+              >
+                <MenuItem value={'todos'}>Todos</MenuItem>
+                <MenuItem value={'saving'}>Ahorros</MenuItem>
+                <MenuItem value={'deposit'}>Depositos</MenuItem>
+                <MenuItem value={'expense'}>Gastos</MenuItem>
+              </Select>
+            </FormControl>
 
             <button
               className="flex gap-1 items-center h-auto text-white rounded-full bg-black px-4"
               onClick={handleOpen}
             >
               <HeroIcons name="PlusIcon" stroke={2} />
-              <span>Add</span>
+              <span>Añadir</span>
             </button>
           </div>
         </div>

@@ -29,21 +29,15 @@ export function ExpenseModal(props: ExpenseProps) {
     register,
     control,
     handleSubmit,
-    watch,
     reset,
     formState: { errors },
   } = useForm<formValues>()
 
   const onSubmit = (data: formValues) => {
     createExpense(data)
-  }
 
-  useEffect(() => {
-    const { unsubscribe } = watch((value) => {
-      console.log(value)
-    })
-    return () => unsubscribe()
-  }, [watch])
+    handleClose()
+  }
 
   return (
     <div className="w-[500px] h-full bg-white rounded-xl p-3 space-y-5 flex-col">
@@ -53,7 +47,7 @@ export function ExpenseModal(props: ExpenseProps) {
         </button>
       </div>
 
-      <form className="flex-col space-y-3" onSubmit={handleSubmit(onSubmit)}>
+      <form className="flex-col space-y-4" onSubmit={handleSubmit(onSubmit)}>
         <h1 className="text-3xl ">Crea una nueva accion</h1>
 
         <div className="flex justify-between gap-14">
@@ -114,7 +108,7 @@ export function ExpenseModal(props: ExpenseProps) {
           />
         </div>
 
-        <div className="flex justify-center gap-7 w-full ">
+        <div className="flex justify-center items-center gap-7 w-full">
           <button
             className="px-5 py-2 rounded-xl bg-gray-300 flex gap-2 justify-between"
             onClick={() => reset()}
@@ -127,7 +121,7 @@ export function ExpenseModal(props: ExpenseProps) {
             className="px-6 py-2 rounded-xl bg-black text-white flex gap-2 justify-between"
             type="submit"
           >
-            <span>Editar</span>
+            <span>Confirmar</span>
             <HeroIcons name="PaperAirplaneIcon" />
           </button>
         </div>

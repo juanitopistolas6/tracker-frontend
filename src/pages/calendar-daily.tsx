@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { IExpense, IResponse } from '@/util/interfaces'
 import ExpenseBubble from '@/components/expense-bubble'
 import { useMemo } from 'react'
+import { formatDate } from '@/util/formateDate'
 
 interface IHour {
   time: string
@@ -25,6 +26,8 @@ export const CalendarDaily = () => {
       return response.data
     },
   })
+
+  const formatedDate = date ? formatDate(new Date(date)) : 'Fecha indefinida...'
 
   const hoursFiltered = useMemo(() => {
     let hours: IHour[] = []
@@ -63,7 +66,7 @@ export const CalendarDaily = () => {
   return (
     <div className="flex-col w-full h-5/6 border rounded-xl overflow-y-auto space-y-8 p-5">
       <div className="flex-col space-y-1 border-b">
-        <h1 className="text-2xl ">Calendario para el 5, Nov 2024</h1>
+        <h1 className="text-2xl ">{`Calendario de actividades para el ${formatedDate}`}</h1>
         <span className="text-gray-400">
           Ve y modifica toda la actividad de este dia
         </span>
