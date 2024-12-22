@@ -1,12 +1,42 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { HeroIcons } from '../util/hero-icons'
 import { CalendarSquare } from '../components/calendar-square'
 import { NullSquare } from '../components/null-square'
-import { useExpense } from '@/context/expenses-context'
+import { useQuery } from '@tanstack/react-query'
+import { useAxios } from '@/hooks/useAxios'
+import { IExpense, IResponse } from '@/util/interfaces'
+import formatDateToMonthYear from '@/util/formateMonth'
 
 export const Calendar = () => {
-  const { state } = useExpense()
+  const { axios } = useAxios()
   const [currentDate, setCurrentDate] = useState(new Date())
+
+  const { data: expensesInterval, refetch } = useQuery({
+    enabled: !!currentDate,
+    queryKey: ['interval-expenses'],
+    queryFn: async () => {
+      const startDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        1
+      ).toISOString()
+
+      const endDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + 1,
+        0
+      ).toISOString()
+
+      const { data } = await axios.get<IResponse<IExpense[]>>(
+        '/expense/interval',
+        {
+          params: { startDate, endDate },
+        }
+      )
+
+      return data
+    },
+  })
 
   const handlePrevMonth = () => {
     setCurrentDate(
@@ -27,7 +57,7 @@ export const Calendar = () => {
 
     const firstDay = new Date(year, month, 1).getDay()
     const lastDate = new Date(year, month + 1, 0).getDate()
-    const stateMonths = state.expenses?.filter((expense) => {
+    const stateMonths = expensesInterval?.data.filter((expense) => {
       const currentMonth = new Date(expense.expenseDate).getMonth()
 
       return currentMonth === month
@@ -41,6 +71,8 @@ export const Calendar = () => {
       const info = stateMonths?.filter((expense) => {
         const currentDay = new Date(expense.expenseDate).getDate()
 
+        console.log(`currentDay: ${expense.expenseDate} \n day: ${currentDay}`)
+
         return currentDay === i
       })
 
@@ -51,7 +83,11 @@ export const Calendar = () => {
     }
 
     return days
-  }, [currentDate, state])
+  }, [currentDate, expensesInterval])
+
+  useEffect(() => {
+    refetch()
+  }, [currentDate])
 
   return (
     <div className="flex-col w-full h-full space-y-5">
@@ -64,7 +100,7 @@ export const Calendar = () => {
           <HeroIcons name="ChevronLeftIcon" />
         </button>
 
-        <span>{currentDate.toDateString()}</span>
+        <span>{formatDateToMonthYear(currentDate)}</span>
 
         <button
           onClick={() => {
@@ -102,10 +138,11 @@ export const Calendar = () => {
         {days.map((i) => {
           if (!i) return <NullSquare />
 
+          //console.log(`date: ${i.date.toLocaleDateString()} \n info: ${i.info}`)
+
           return (
             <CalendarSquare
-              date={i.date}
-              info={i.info}
+              {...i}
               current={
                 currentDate.toLocaleDateString() == i.date.toLocaleDateString()
               }

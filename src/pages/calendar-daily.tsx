@@ -19,9 +19,9 @@ export const CalendarDaily = () => {
   const { data: expenses } = useQuery({
     queryKey: ['expense-day'],
     queryFn: async () => {
-      const response = await axios.get<IResponse<IExpense[]>>(
-        `/expense/date?date=${date}`
-      )
+      const response = await axios.get<IResponse<IExpense[]>>(`/expense/date`, {
+        params: { date },
+      })
 
       return response.data
     },
@@ -34,9 +34,13 @@ export const CalendarDaily = () => {
 
     for (let i = 0; i <= hoursArray.length; i++) {
       const currentHours =
-        expenses?.data?.filter(
-          (expense) => new Date(expense.expenseDate).getHours() === i
-        ) ?? undefined
+        expenses?.data?.filter((expense) => {
+          console.log(
+            `hora: ${new Date(expense.expenseDate).getHours()}\ni:${i} \ndescription: ${expense.description} \n${new Date(expense.expenseDate).getHours() === i}`
+          )
+
+          return new Date(expense.expenseDate).getHours() === i
+        }) ?? undefined
 
       const item = { time: hoursArray[i], expenses: currentHours }
 
@@ -45,8 +49,6 @@ export const CalendarDaily = () => {
 
     return hours
   }, [expenses])
-
-  console.log(expenses)
 
   const colorArrays = ['green', 'red', 'blue', 'pink']
 

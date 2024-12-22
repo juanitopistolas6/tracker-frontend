@@ -8,6 +8,8 @@ const ExpenseBubble = (props: {
 }) => {
   const { hour, expenses } = props
 
+  //console.log(expenses)
+
   return (
     <div className="flex gap-5 justify-between relative pb-5 group">
       <button className="absolute left-1/2 transform -translate-x-1/2 -top-4 border py-1 px-2 flex bg-white rounded-md gap-2 opacity-0 invisible transition-opacity duration-300 group-hover:opacity-100 group-hover:visible">

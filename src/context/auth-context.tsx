@@ -12,11 +12,19 @@ import {
   IResponse,
   IUser,
   ILoginResponse,
+  IUserStats,
 } from '../util/interfaces'
-import { UseMutateFunction, useMutation, useQuery } from '@tanstack/react-query'
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  UseMutateFunction,
+  useMutation,
+  useQuery,
+} from '@tanstack/react-query'
 
 interface IAuthValues {
   user: IUser | null
+  stats: IResponse<IUserStats> | undefined
   isAuthenticated: boolean
   loginSuccess: boolean
   error: string | null
@@ -26,6 +34,9 @@ interface IAuthValues {
     ILoginPayload,
     unknown
   >
+  refetchStats: (
+    options?: RefetchOptions
+  ) => Promise<QueryObserverResult<IResponse<IUserStats>, Error>>
 }
 
 const authContext = createContext<IAuthValues | null>(null)
@@ -63,6 +74,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   })
 
+  const { data: stats, refetch: refetchStats } = useQuery({
+    queryKey: ['stats'],
+    enabled: !!isAuthenticated,
+    queryFn: async () => {
+      const response = await axios.get<IResponse<IUserStats>>('/user/stats')
+
+      return response.data
+    },
+  })
+
   const { data: token, isSuccess } = useQuery({
     queryKey: ['token'],
     enabled: !!cookies.get('token'),
@@ -88,10 +109,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const values: IAuthValues = {
     user,
+    stats,
     isAuthenticated,
-    login,
     error,
     loginSuccess,
+    login,
+    refetchStats,
   }
 
   return <authContext.Provider value={values}>{children}</authContext.Provider>

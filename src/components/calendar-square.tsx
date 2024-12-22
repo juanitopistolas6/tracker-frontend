@@ -29,7 +29,6 @@ export const CalendarSquare = (square: squareProps) => {
 
     return color
   }
-
   return (
     <NavLink
       to={date.toISOString()}
@@ -47,7 +46,7 @@ export const CalendarSquare = (square: squareProps) => {
 
         {overInfo && (
           <div className="rounded-full bg-gray-300 flex items-center text-sm p-1 px-2">
-            {overInfo}
+            {`+${overInfo}`}
           </div>
         )}
       </div>

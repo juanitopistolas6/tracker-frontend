@@ -14,29 +14,31 @@ export const Expenses = () => {
       <div className="border-b-2 text-black py-2 px-5 font-bold">
         <span>{`${currentDate.getDate()} de ${months[currentDate.getMonth() + 1]}`}</span>
       </div>
-      {expenses?.map((item, i) => {
-        const itemDate = new Date(item.expenseDate)
+      <div className="flex-col w-full space-y-2 h-1/2">
+        {expenses?.map((item, i) => {
+          const itemDate = new Date(item.expenseDate)
 
-        if (currentDate.getDate() !== itemDate.getDate()) {
-          currentDate = itemDate
+          if (currentDate.getDate() !== itemDate.getDate()) {
+            currentDate = itemDate
 
-          return (
-            <>
-              <div
-                className="border-b-2 text-black py-2 px-5 font-bold"
-                key={`day: ${i}`}
-              >
-                <span
-                  key={i}
-                >{`${currentDate.getDate()} de ${months[currentDate.getMonth() + 1]}`}</span>
-              </div>
-              <ExpenseType {...item} key={i} />
-            </>
-          )
-        }
+            return (
+              <>
+                <div
+                  className="border-b-2 text-black py-2 px-5 font-bold"
+                  key={`day: ${i}`}
+                >
+                  <span
+                    key={i}
+                  >{`${currentDate.getDate()} de ${months[currentDate.getMonth() + 1]}`}</span>
+                </div>
+                <ExpenseType {...item} key={i} />
+              </>
+            )
+          }
 
-        return <ExpenseType {...item} key={i} />
-      })}
+          return <ExpenseType {...item} key={i} />
+        })}
+      </div>
 
       {hasNextPage && (
         <div className="flex justify-center">
