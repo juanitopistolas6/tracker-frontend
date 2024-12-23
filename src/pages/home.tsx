@@ -10,18 +10,69 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
+  Tooltip,
 } from '@mui/material'
 import { useExpense } from '@/context/expenses-context'
 import { IFilter } from '@/util/interfaces'
+import { useMemo } from 'react'
 
 export const HomePage = () => {
   const { handleClose, handleOpen, open } = useModal()
-  const { user } = useAuth()
-  const { setFilter } = useExpense()
+  const { stats } = useAuth()
+  const { setFilter, expenses } = useExpense()
+
+  const { balance, savings, totalExpenses, salary } = stats?.data ?? {}
+
+  const total = useMemo(
+    () => (balance ?? 0) + (savings ?? 0) + (totalExpenses ?? 0),
+    [stats]
+  )
+
+  const savingsPorcentage = useMemo(() => {
+    return (((savings ?? 0) * 100) / total).toFixed(2)
+  }, [savings, total])
+
+  const balancePorcentage = useMemo(() => {
+    return (((balance ?? 0) * 100) / total).toFixed(2)
+  }, [balance, total])
+
+  const totalExpensesPorcentage = useMemo(() => {
+    return (((totalExpenses ?? 0) * 100) / total).toFixed(2)
+  }, [totalExpenses, total])
 
   const handleChange = (event: SelectChangeEvent) => {
     setFilter(event.target.value as IFilter)
   }
+
+  const expensesLenght = useMemo(() => {
+    return expenses?.reduce((acc, current) => {
+      return current.type === 'expense' ? acc + 1 : acc
+    }, 0)
+  }, [expenses])
+
+  const savingsLenght = useMemo(() => {
+    return expenses?.reduce((acc, current) => {
+      return current.type === 'saving' ? acc + 1 : acc
+    }, 0)
+  }, [expenses])
+
+  const depositsLenght = useMemo(() => {
+    return expenses?.reduce((acc, current) => {
+      return current.type === 'deposit' ? acc + 1 : acc
+    }, 0)
+  }, [expenses])
+
+  const progressStyles = useMemo(
+    () => ({
+      expenses: {
+        width: `${totalExpensesPorcentage}%`,
+        backgroundColor: 'red',
+      },
+      balance: { width: `${balancePorcentage}%`, backgroundColor: 'green' },
+      savings: { width: `${savingsPorcentage}%`, backgroundColor: 'yellow' },
+    }),
+    [totalExpensesPorcentage, balancePorcentage]
+  )
 
   return (
     <>
@@ -44,13 +95,24 @@ export const HomePage = () => {
               <h1 className="text-blue-600">Total</h1>
             </div>
 
-            <div className="font-bold text-3xl">$219,000.00</div>
+            <div className="font-bold text-3xl">
+              {total.toLocaleString('en-US')}
+            </div>
           </div>
 
           <div className="w-full flex items-end py-1">
             <div className="w-full rounded-3xl border flex relative h-4 overflow-hidden">
-              <span className="w-1/3 bg-red-600"></span>
-              <span className="w-2/3 bg-green-600"></span>
+              <Tooltip title="Gastos" placement="top" arrow>
+                <span style={progressStyles.expenses}></span>
+              </Tooltip>
+
+              <Tooltip title="Balance" placement="top" arrow>
+                <span style={progressStyles.balance}></span>
+              </Tooltip>
+
+              <Tooltip title="Ahorros" placement="top" arrow>
+                <span style={progressStyles.savings}></span>
+              </Tooltip>
             </div>
           </div>
         </div>
@@ -63,42 +125,44 @@ export const HomePage = () => {
               <span></span>
             </div>
 
-            <div className="text-3xl font-bold text-black">{`$${user?.salary.toFixed(2)}`}</div>
+            <div className="text-3xl font-bold text-black">{`$${salary?.toLocaleString('es-MX')}`}</div>
           </div>
 
           <div className="flex flex-col items-start text-gray-800">
             <div className="flex justify-between w-full text-sm font-semibold text-stone-900-400">
               <span>Balance</span>
-              <span>23%</span>
+              <span>{`${balancePorcentage}%`}</span>
             </div>
 
-            <div className="text-3xl font-bold text-black">{`$${user?.balance.toFixed(2)}`}</div>
+            <div className="text-3xl font-bold text-black">{`$${balance?.toLocaleString('es-MX')}`}</div>
           </div>
 
           <div className="flex flex-col items-start text-gray-800">
             <div className="flex justify-between w-full text-sm font-semibold text-yellow-400">
-              <span>Savings</span>
-              <span>23%</span>
+              <span>Ahorros</span>
+              <span>{`${savingsPorcentage}%`}</span>
             </div>
 
-            <div className="text-3xl font-bold text-black">{`$${user?.savings.toFixed(2)}`}</div>
+            <div className="text-3xl font-bold text-black">{`$${savings?.toLocaleString('es-MX')}`}</div>
           </div>
 
           <div className="flex flex-col items-start text-gray-800">
             <div className="flex justify-between w-full text-sm font-semibold text-red-600">
-              <span>Expenses</span>
-              <span>73%</span>
+              <span>Gastos</span>
+              <span>{`${totalExpensesPorcentage}%`}</span>
             </div>
 
-            <div className="text-3xl font-bold text-black">$87,600.34</div>
+            <div className="text-3xl font-bold text-black">
+              {totalExpenses?.toLocaleString('en-US')}
+            </div>
           </div>
         </div>
 
         {/* Transactions */}
         <div className="flex h-auto justify-between">
           <div className="flex-col">
-            <h1 className="font-bold text-2xl">Transactions</h1>
-            <span>Usted ha tenido 2 ingresos y 10 gastos</span>
+            <h1 className="font-bold text-2xl">Transacciones</h1>
+            <span>{`Usted ha tenido ${depositsLenght} ingresos, ${expensesLenght} gastos y ${savingsLenght} ahorros`}</span>
           </div>
 
           <div className="flex gap-4 h-auto">

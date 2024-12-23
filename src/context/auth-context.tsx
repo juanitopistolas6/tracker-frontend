@@ -80,7 +80,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryFn: async () => {
       const response = await axios.get<IResponse<IUserStats>>('/user/stats')
 
-      return response.data
+      const { data } = response
+
+      return data
     },
   })
 

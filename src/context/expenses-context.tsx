@@ -73,7 +73,7 @@ const expenseContext = createContext<IExpenseValues | null>(null)
 
 export function ExpenseProvider({ children }: { children: ReactNode }) {
   const { axios } = useAxios()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, refetchStats } = useAuth()
   const [filter, setFilter] = useState<IFilter>('todos')
   const [state, dispatch] = useReducer(expenseReducer, {
     expenses: [],
@@ -143,6 +143,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
       if (status !== 200) return
 
       dispatch({ action: 'ADD_EXPENSE', payload: expense })
+      refetchStats()
     },
     onError: () => {
       dispatch({ action: 'FETCH_ERROR' })
@@ -170,6 +171,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
       if (status !== 200) return
 
       dispatch({ action: 'REPLACE_EXPENSE', payload: expense })
+      refetchStats()
     },
     onError: () => {
       dispatch({ action: 'FETCH_ERROR' })
@@ -188,6 +190,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
       if (status !== 200) return
 
       dispatch({ action: 'REMOVE_EXPENSE', payload: expense })
+      refetchStats()
     },
     onError: () => {
       dispatch({ action: 'FETCH_ERROR' })
