@@ -6,9 +6,12 @@ import {
   MenuItem,
 } from '@mui/material'
 import { HeroIcons, IconName } from '../util/hero-icons'
-import { useRef, useState } from 'react'
+import { lazy, Suspense, useRef, useState } from 'react'
+import { useModal } from '@/hooks/useModal'
+import { useExpense } from '@/context/expenses-context'
 
 interface IExpenseType {
+  id: string
   type: 'saving' | 'deposit' | 'expense'
   amount: number
   description: string
@@ -26,9 +29,18 @@ const iconMapping: Record<string, IconConfig> = {
 }
 
 export const ExpenseType = (expenseProps: IExpenseType) => {
-  const { amount, description, type } = expenseProps
+  const { amount, description, type, id } = expenseProps
+  const { deleteExpense } = useExpense()
+  const {
+    handleClose: handleCloseModal,
+    handleOpen,
+    open: openModal,
+  } = useModal()
   const [open, setOpen] = useState<boolean>(false)
   const anchorRef = useRef<HTMLButtonElement>(null)
+
+  const ExpenseModal = lazy(() => import('../components/modals/expense-modal'))
+  const Modal = lazy(() => import('../components/modals/modal'))
 
   const handleClose = (event: Event | React.SyntheticEvent) => {
     if (
@@ -53,61 +65,87 @@ export const ExpenseType = (expenseProps: IExpenseType) => {
   const icon = iconMapping[type]
 
   return (
-    <div className="border-b-2 flex py-2 relative px-5">
-      <div className="flex gap-2 relative left-0 w-24">
-        <HeroIcons
-          name={icon.name}
-          className={`h-6 w-6 ${icon.color}`}
-          stroke={3}
-        />
-        <span>{type}</span>
-      </div>
+    <>
+      <Suspense fallback={<div></div>}>
+        {openModal && (
+          <Modal
+            className="flex items-start top-1/2 transform -translate-y-1/2 justify-center w-full"
+            closeModal={handleCloseModal}
+            open
+          >
+            <ExpenseModal
+              action="edit"
+              handleClose={handleCloseModal}
+              id={id}
+            />
+          </Modal>
+        )}
+      </Suspense>
 
-      <span className="flex-grow text-center">{description}</span>
+      <div className="border-b-2 flex py-2 relative px-5">
+        <div className="flex gap-2 relative left-0 w-24">
+          <HeroIcons
+            name={icon.name}
+            className={`h-6 w-6 ${icon.color}`}
+            stroke={3}
+          />
+          <span>{type}</span>
+        </div>
 
-      <span className="font-bold right-0 w-24 text-right">{`${type == 'expense' ? '-' : ''}$${amount}`}</span>
+        <span className="flex-grow text-center">{description}</span>
 
-      <button
-        className="absolute -right-10 rounded-full hover:bg-gray-200 my-auto flex items-center p-2 top-1/2 transform -translate-y-1/2"
-        ref={anchorRef}
-        onClick={() => setOpen(!open)}
-      >
-        <HeroIcons
-          name="EllipsisVerticalIcon"
-          className="text-black w-5 h-5"
-          stroke={2}
-        />
-        <Popper
-          open={open}
-          anchorEl={anchorRef.current}
-          role={undefined}
-          placement="right-start"
-          transition
-          disablePortal
+        <span className="font-bold right-0 w-24 text-right">{`${type == 'expense' ? '-' : ''}$${amount}`}</span>
+
+        <button
+          className="absolute -right-10 rounded-full hover:bg-gray-200 my-auto flex items-center p-2 top-1/2 transform -translate-y-1/2"
+          ref={anchorRef}
+          onClick={() => setOpen(!open)}
         >
-          {({ TransitionProps, placement }) => (
-            <Grow
-              {...TransitionProps}
-              style={{
-                transformOrigin: placement === 'right-start' ? 'left' : 'left',
-              }}
-            >
-              <div className="mb-1 shadow-2xl rounded-xl w-[150px]">
-                <ClickAwayListener onClickAway={handleClose}>
-                  <MenuList
-                    autoFocusItem={open}
-                    id="composition-menu"
-                    aria-labelledby="composition-button"
-                    onKeyDown={handleListKeyDown}
-                  >
-                    <MenuItem>Editar</MenuItem>
-                  </MenuList>
-                </ClickAwayListener>
-              </div>
-            </Grow>
-          )}
-        </Popper>
-      </button>
-    </div>
+          <HeroIcons
+            name="EllipsisVerticalIcon"
+            className="text-black w-5 h-5"
+            stroke={2}
+          />
+          <Popper
+            open={open}
+            anchorEl={anchorRef.current}
+            role={undefined}
+            placement="right-start"
+            transition
+            disablePortal
+          >
+            {({ TransitionProps, placement }) => (
+              <Grow
+                {...TransitionProps}
+                style={{
+                  transformOrigin:
+                    placement === 'right-start' ? 'left' : 'left',
+                }}
+              >
+                <div className="mb-1 shadow-2xl rounded-xl w-[120px]">
+                  <ClickAwayListener onClickAway={handleClose}>
+                    <MenuList
+                      autoFocusItem={open}
+                      id="composition-menu"
+                      aria-labelledby="composition-button"
+                      onKeyDown={handleListKeyDown}
+                    >
+                      <MenuItem onClick={() => handleOpen()}>Editar</MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          deleteExpense(id)
+                        }}
+                      >
+                        Eliminar
+                      </MenuItem>
+                    </MenuList>
+                  </ClickAwayListener>
+                </div>
+              </Grow>
+            )}
+          </Popper>
+        </button>
+      </div>
+    </>
   )
 }

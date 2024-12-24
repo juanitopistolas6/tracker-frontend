@@ -137,6 +137,10 @@ export function setDateByType(
 }
 
 export function getDateByType(date: Date, type: TimePickerType) {
+  if (!(date instanceof Date)) {
+    date = new Date(date)
+  }
+
   switch (type) {
     case 'minutes':
       return getValidMinuteOrSecond(String(date.getMinutes()))

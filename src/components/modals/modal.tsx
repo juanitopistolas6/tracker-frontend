@@ -33,7 +33,7 @@ const variants: Variants[] = [
 
 export const [backdrop, modal] = variants
 
-export const Modal = ({
+const Modal = ({
   open,
   children,
   className,
@@ -75,3 +75,5 @@ export const Modal = ({
     </AnimatePresence>
   )
 }
+
+export default Modal

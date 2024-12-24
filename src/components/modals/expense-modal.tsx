@@ -9,10 +9,15 @@ import { HeroIcons } from '../../util/hero-icons'
 import { Controller, useForm } from 'react-hook-form'
 import { useExpense } from '../../context/expenses-context'
 import { DateTimePicker } from '@/util/time-picker/date-time-picker'
-import { useEffect } from 'react'
+import { IResponse } from '@/util/interfaces/response'
+import { useAxios } from '@/hooks/useAxios'
+import { IExpense } from '@/util/interfaces'
+import { useQuery } from '@tanstack/react-query'
 
 interface ExpenseProps {
+  action: 'edit' | 'create'
   handleClose: () => void
+  id?: string
 }
 
 interface formValues {
@@ -22,106 +27,122 @@ interface formValues {
   type?: 'expense' | 'deposit' | 'saving'
 }
 
-export function ExpenseModal(props: ExpenseProps) {
-  const { handleClose } = props
-  const { createExpense } = useExpense()
+function ExpenseModal(props: ExpenseProps) {
+  const { handleClose, action, id } = props
+  const { axios } = useAxios()
+  const { createExpense, editExpense } = useExpense()
+
+  const { data: expense } = useQuery({
+    enabled: action === 'edit',
+    queryKey: [`${id}`, 'expense'],
+    queryFn: async () => {
+      const response = await axios.get<IResponse<IExpense>>(`/expense/${id}`)
+
+      const { data } = response
+
+      return data
+    },
+  })
+
   const {
     register,
     control,
     handleSubmit,
-    reset,
     formState: { errors },
-  } = useForm<formValues>()
+  } = useForm<formValues>({ values: expense?.data })
 
   const onSubmit = (data: formValues) => {
-    createExpense(data)
+    if (!id && action == 'edit') return
+
+    action === 'create'
+      ? createExpense(data)
+      : editExpense({ expense: data, id: id! })
 
     handleClose()
   }
 
   return (
-    <div className="w-[500px] h-full bg-white rounded-xl p-3 space-y-5 flex-col">
-      <div className="flex justify-between">
+    <div className="w-[500px] h-full bg-white rounded-xl pt-3 space-y-5 flex-col">
+      <div className="flex justify-between px-3">
         <button onClick={handleClose}>
           <HeroIcons name="XMarkIcon" />
         </button>
       </div>
 
-      <form className="flex-col space-y-4" onSubmit={handleSubmit(onSubmit)}>
-        <h1 className="text-3xl ">Crea una nueva accion</h1>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex-col space-y-4 px-3">
+          <h1 className="text-3xl ">Crea una nueva accion</h1>
 
-        <div className="flex justify-between gap-14">
-          <div className="flex-col space-y-3 w-full">
-            <TextField
-              label="Monto"
-              {...register('amount', { valueAsNumber: true })}
-            />
+          <div className="flex justify-between gap-14">
+            <div className="flex-col space-y-3 w-full">
+              <TextField
+                label="Monto"
+                {...register('amount', {
+                  valueAsNumber: true,
+                })}
+              />
 
-            {errors.amount && (
-              <p style={{ color: 'red' }}>{errors.amount.message}</p>
-            )}
+              {errors.amount && (
+                <p style={{ color: 'red' }}>{errors.amount.message}</p>
+              )}
+            </div>
+
+            <FormControl className="w-full">
+              <InputLabel id="demo-simple-select-label">Tipo</InputLabel>
+              <Controller
+                name="type"
+                control={control}
+                defaultValue={expense?.data.type ?? 'expense'}
+                rules={{
+                  required: 'Este campo es obligatorio',
+                }}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    disabled={action === 'edit'}
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    label="Age"
+                  >
+                    <MenuItem value={'expense'}>Expense</MenuItem>
+                    <MenuItem value={'deposit'}>Deposit</MenuItem>
+                    <MenuItem value={'saving'}>Saving</MenuItem>
+                  </Select>
+                )}
+              />
+              {errors.type && (
+                <p style={{ color: 'red' }}>{errors.type.message}</p>
+              )}
+            </FormControl>
           </div>
 
-          <FormControl className="w-full">
-            <InputLabel id="demo-simple-select-label">Age</InputLabel>
+          <div className="flex justify-between gap-14 items-center">
             <Controller
-              name="type"
               control={control}
-              defaultValue="expense"
-              rules={{
-                required: 'Este campo es obligatorio',
-              }}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="Age"
-                >
-                  <MenuItem value={'expense'}>Expense</MenuItem>
-                  <MenuItem value={'deposit'}>Deposit</MenuItem>
-                  <MenuItem value={'saving'}>Saving</MenuItem>
-                </Select>
+              name="expenseDate"
+              render={({ field: { value, onChange } }) => (
+                <DateTimePicker onChange={onChange} value={value} />
               )}
             />
-            {errors.type && (
-              <p style={{ color: 'red' }}>{errors.type.message}</p>
-            )}
-          </FormControl>
+          </div>
+
+          <div className="flex justify-between w-full">
+            <TextField
+              label="Descripcion"
+              className="w-full h-12"
+              {...register('description')}
+            />
+          </div>
         </div>
 
-        <div className="flex justify-between gap-14 items-center">
-          <Controller
-            control={control}
-            name="expenseDate"
-            render={({ field: { value, onChange } }) => (
-              <DateTimePicker onChange={onChange} value={value} />
-            )}
-          />
-        </div>
-
-        <div className="flex justify-between w-full">
-          <TextField
-            label="Descripcion"
-            className="w-full h-12"
-            {...register('description')}
-          />
-        </div>
-
-        <div className="flex justify-center items-center gap-7 w-full">
+        <div className="flex justify-center items-center w-full px-0 object-cover overflow-hidden mt-5">
           <button
-            className="px-5 py-2 rounded-xl bg-gray-300 flex gap-2 justify-between"
-            onClick={() => reset()}
-          >
-            <span>Limpiar</span>
-            <HeroIcons name="TrashIcon" />
-          </button>
-
-          <button
-            className="px-6 py-2 rounded-xl bg-black text-white flex gap-2 justify-between"
+            className="w-full justify-center bg-black text-white flex gap-2 h-12 items-center"
             type="submit"
           >
-            <span>Confirmar</span>
+            <span className="text-xl">
+              {action === 'create' ? 'Crear' : 'Editar'}
+            </span>
             <HeroIcons name="PaperAirplaneIcon" />
           </button>
         </div>
@@ -129,3 +150,5 @@ export function ExpenseModal(props: ExpenseProps) {
     </div>
   )
 }
+
+export default ExpenseModal

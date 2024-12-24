@@ -1,8 +1,6 @@
 import { HeroIcons } from '../util/hero-icons'
 import { Expenses } from '../components/expenses'
 import { useModal } from '../hooks/useModal'
-import { ExpenseModal } from '../components/modals/expense-modal'
-import { Modal } from '../components/modals/modal'
 import { useAuth } from '@/context/auth-context'
 import {
   FormControl,
@@ -14,12 +12,15 @@ import {
 } from '@mui/material'
 import { useExpense } from '@/context/expenses-context'
 import { IFilter } from '@/util/interfaces'
-import { useMemo } from 'react'
+import { lazy, Suspense, useMemo } from 'react'
 
 export const HomePage = () => {
   const { handleClose, handleOpen, open } = useModal()
   const { stats } = useAuth()
   const { setFilter, expenses } = useExpense()
+
+  const ExpenseModal = lazy(() => import('../components/modals/expense-modal'))
+  const Modal = lazy(() => import('../components/modals/modal'))
 
   const { balance, savings, totalExpenses, salary } = stats?.data ?? {}
 
@@ -68,7 +69,7 @@ export const HomePage = () => {
         width: `${totalExpensesPorcentage}%`,
         backgroundColor: 'red',
       },
-      balance: { width: `${balancePorcentage}%`, backgroundColor: 'green' },
+      balance: { width: `${balancePorcentage}%`, backgroundColor: 'blue' },
       savings: { width: `${savingsPorcentage}%`, backgroundColor: 'yellow' },
     }),
     [totalExpensesPorcentage, balancePorcentage]
@@ -76,13 +77,22 @@ export const HomePage = () => {
 
   return (
     <>
-      <Modal
-        open={open}
-        closeModal={handleClose}
-        className="flex items-start top-1/2 transform -translate-y-1/2 justify-center w-full h-full"
-      >
-        <ExpenseModal handleClose={handleClose} />
-      </Modal>
+      <Suspense fallback={null}>
+        {open && (
+          <Modal
+            open={open}
+            closeModal={handleClose}
+            className="flex items-start top-1/2 transform -translate-y-1/2 justify-center w-full"
+          >
+            <ExpenseModal
+              handleClose={handleClose}
+              action="create"
+              id={undefined}
+            />
+          </Modal>
+        )}
+      </Suspense>
+
       <div className="flex-col space-y-12">
         <div className="text-4xl font-bold">
           <h1>Summer</h1>
@@ -92,7 +102,7 @@ export const HomePage = () => {
         <div className="flex justify-between gap-10">
           <div className="flex-col">
             <div className="font-bold text-sm">
-              <h1 className="text-blue-600">Total</h1>
+              <h1 className="text-black">Total</h1>
             </div>
 
             <div className="font-bold text-3xl">
@@ -128,7 +138,7 @@ export const HomePage = () => {
             <div className="text-3xl font-bold text-black">{`$${salary?.toLocaleString('es-MX')}`}</div>
           </div>
 
-          <div className="flex flex-col items-start text-gray-800">
+          <div className="flex flex-col items-start text-blue-800">
             <div className="flex justify-between w-full text-sm font-semibold text-stone-900-400">
               <span>Balance</span>
               <span>{`${balancePorcentage}%`}</span>

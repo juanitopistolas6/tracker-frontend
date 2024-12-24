@@ -71,8 +71,6 @@ export const Calendar = () => {
       const info = stateMonths?.filter((expense) => {
         const currentDay = new Date(expense.expenseDate).getDate()
 
-        console.log(`currentDay: ${expense.expenseDate} \n day: ${currentDay}`)
-
         return currentDay === i
       })
 
@@ -80,6 +78,10 @@ export const Calendar = () => {
         date: new Date(year, month, i),
         info,
       })
+    }
+
+    for (let i = days.length; i <= 34; i++) {
+      days.push(null)
     }
 
     return days
@@ -137,8 +139,6 @@ export const Calendar = () => {
       <div className="border rounded-md h-auto grid grid-cols-7 overflow-hidden">
         {days.map((i) => {
           if (!i) return <NullSquare />
-
-          //console.log(`date: ${i.date.toLocaleDateString()} \n info: ${i.info}`)
 
           return (
             <CalendarSquare

@@ -55,7 +55,7 @@ function replaceExpense(
     (item) => item.id === expense.id
   )
 
-  if (!expenseFound) return { ...state, error: true }
+  if (expenseFound === -1) return { ...state, error: true }
 
   state.expenses[expenseFound] = expense
 
@@ -72,8 +72,7 @@ function manageExpense(
   if (action == 'ADD') {
     return {
       expenses: [{ ...payload }, ...state.expenses].sort(
-        (a, b) =>
-          new Date(a.expenseDate).getTime() + new Date(b.expenseDate).getTime()
+        (a, b) => +new Date(a.expenseDate) + +new Date(b.expenseDate)
       ),
       error: false,
     }
@@ -83,12 +82,8 @@ function manageExpense(
     return itemFound
       ? {
           expenses: [
-            ...state.expenses.filter((item) => item.id == itemFound.id),
-          ].sort(
-            (a, b) =>
-              new Date(a.expenseDate).getTime() -
-              new Date(b.expenseDate).getTime()
-          ),
+            ...state.expenses.filter((item) => item.id !== itemFound.id),
+          ].sort((a, b) => +new Date(a.expenseDate) + +new Date(b.expenseDate)),
           error: false,
         }
       : { ...state, error: true }

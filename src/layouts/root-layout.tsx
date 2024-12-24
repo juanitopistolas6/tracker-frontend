@@ -2,7 +2,7 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { HeroIcons } from '../util/hero-icons'
 import logo from '../util/logo.png'
 import { useModal } from '../hooks/useModal'
-import { Modal } from '../components/modals/modal'
+import Modal from '../components/modals/modal'
 import { LoginModal } from '../components/modals/login-modal'
 
 export const RootLayout = () => {

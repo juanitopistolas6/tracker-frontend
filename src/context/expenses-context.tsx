@@ -180,6 +180,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
 
   const { mutate: deleteExpense } = useMutation({
     mutationFn: async (id: string) => {
+      console.log(id)
       const response = await axios.delete<IResponse<IExpense>>(`/expense/${id}`)
 
       return response.data
@@ -187,12 +188,15 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     onSuccess: (data) => {
       const { data: expense, status } = data
 
+      console.log(data)
+
       if (status !== 200) return
 
       dispatch({ action: 'REMOVE_EXPENSE', payload: expense })
       refetchStats()
     },
-    onError: () => {
+    onError: (data) => {
+      console.log(data.message)
       dispatch({ action: 'FETCH_ERROR' })
     },
   })
