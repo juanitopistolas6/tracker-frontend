@@ -13,7 +13,7 @@ interface form {
   password: string
 }
 
-export const LoginModal = (loginProps: loginProps) => {
+const LoginModal = (loginProps: loginProps) => {
   const { handleClose } = loginProps
   const { login, loginSuccess, error } = useAuth()
   const { register, handleSubmit, getValues } = useForm<form>()
@@ -72,3 +72,5 @@ export const LoginModal = (loginProps: loginProps) => {
     </div>
   )
 }
+
+export default LoginModal

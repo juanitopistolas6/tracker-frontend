@@ -1,11 +1,10 @@
 import { useParams } from 'react-router-dom'
 import { hoursArray } from '../util/day-hours'
-import { useAxios } from '@/hooks/useAxios'
-import { useQuery } from '@tanstack/react-query'
-import { IExpense, IResponse } from '@/util/interfaces'
-import ExpenseBubble from '@/components/expense-bubble'
+import { IExpense } from '@/util/interfaces'
+import { ExpenseBubble } from '@/components/expense-bubble'
 import { useMemo } from 'react'
 import { formatDate } from '@/util/formateDate'
+import { useCalendarDaily } from '@/context/calendar-daily'
 
 interface IHour {
   time: string
@@ -13,19 +12,8 @@ interface IHour {
 }
 
 export const CalendarDaily = () => {
-  const { axios } = useAxios()
   const { date } = useParams()
-
-  const { data: expenses } = useQuery({
-    queryKey: ['expense-day'],
-    queryFn: async () => {
-      const response = await axios.get<IResponse<IExpense[]>>(`/expense/date`, {
-        params: { date },
-      })
-
-      return response.data
-    },
-  })
+  const { expenses } = useCalendarDaily()
 
   const formatedDate = date ? formatDate(new Date(date)) : 'Fecha indefinida...'
 
@@ -35,10 +23,6 @@ export const CalendarDaily = () => {
     for (let i = 0; i <= hoursArray.length; i++) {
       const currentHours =
         expenses?.data?.filter((expense) => {
-          console.log(
-            `hora: ${new Date(expense.expenseDate).getHours()}\ni:${i} \ndescription: ${expense.description} \n${new Date(expense.expenseDate).getHours() === i}`
-          )
-
           return new Date(expense.expenseDate).getHours() === i
         }) ?? undefined
 

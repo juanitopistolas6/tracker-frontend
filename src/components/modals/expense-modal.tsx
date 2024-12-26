@@ -13,11 +13,13 @@ import { IResponse } from '@/util/interfaces/response'
 import { useAxios } from '@/hooks/useAxios'
 import { IExpense } from '@/util/interfaces'
 import { useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
 
 interface ExpenseProps {
   action: 'edit' | 'create'
-  handleClose: () => void
   id?: string
+  defaultDate?: Date
+  handleClose: () => void
 }
 
 interface formValues {
@@ -28,7 +30,7 @@ interface formValues {
 }
 
 function ExpenseModal(props: ExpenseProps) {
-  const { handleClose, action, id } = props
+  const { handleClose, action, id, defaultDate } = props
   const { axios } = useAxios()
   const { createExpense, editExpense } = useExpense()
 
@@ -48,8 +50,9 @@ function ExpenseModal(props: ExpenseProps) {
     register,
     control,
     handleSubmit,
+    reset,
     formState: { errors },
-  } = useForm<formValues>({ values: expense?.data })
+  } = useForm<formValues>()
 
   const onSubmit = (data: formValues) => {
     if (!id && action == 'edit') return
@@ -60,6 +63,13 @@ function ExpenseModal(props: ExpenseProps) {
 
     handleClose()
   }
+
+  useEffect(() => {
+    reset({
+      ...expense?.data,
+      expenseDate: defaultDate ?? expense?.data.expenseDate,
+    })
+  }, [expense, reset])
 
   return (
     <div className="w-[500px] h-full bg-white rounded-xl pt-3 space-y-5 flex-col">
@@ -76,6 +86,7 @@ function ExpenseModal(props: ExpenseProps) {
           <div className="flex justify-between gap-14">
             <div className="flex-col space-y-3 w-full">
               <TextField
+                InputLabelProps={{ shrink: true }}
                 label="Monto"
                 {...register('amount', {
                   valueAsNumber: true,
@@ -128,6 +139,7 @@ function ExpenseModal(props: ExpenseProps) {
 
           <div className="flex justify-between w-full">
             <TextField
+              InputLabelProps={{ shrink: true }}
               label="Descripcion"
               className="w-full h-12"
               {...register('description')}

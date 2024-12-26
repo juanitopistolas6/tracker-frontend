@@ -2,21 +2,49 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { HeroIcons } from '../util/hero-icons'
 import logo from '../util/logo.png'
 import { useModal } from '../hooks/useModal'
-import Modal from '../components/modals/modal'
-import { LoginModal } from '../components/modals/login-modal'
+import { lazy, Suspense } from 'react'
+import { Wait } from '@/components/backdrop'
 
 export const RootLayout = () => {
   const { handleClose, handleOpen, open } = useModal()
+  const {
+    handleClose: closeRegister,
+    open: openRegister,
+    handleOpen: openModal,
+  } = useModal()
+
+  const Modal = lazy(() => import('../components/modals/modal'))
+  const LoginModal = lazy(() => import('../components/modals/login-modal'))
+  const RegisterModal = lazy(
+    () => import('../components/modals/register-modal')
+  )
 
   return (
     <>
-      <Modal
-        open={open}
-        closeModal={handleClose}
-        className="flex items-start top-1/2 transform -translate-y-1/2 justify-center w-full"
-      >
-        <LoginModal handleClose={handleClose} />
-      </Modal>
+      <Suspense fallback={<Wait />}>
+        {open && (
+          <Modal
+            open={open}
+            closeModal={handleClose}
+            className="flex items-start top-1/2 transform -translate-y-1/2 justify-center w-full"
+          >
+            <LoginModal handleClose={handleClose} />
+          </Modal>
+        )}
+      </Suspense>
+
+      <Suspense fallback={<Wait />}>
+        {openRegister && (
+          <Modal
+            open={openRegister}
+            closeModal={closeRegister}
+            className="flex items-start top-1/2 transform -translate-y-1/2 justify-center w-full"
+          >
+            <RegisterModal />
+          </Modal>
+        )}
+      </Suspense>
+
       <div className="w-screen h-screen flex justify-center">
         <div className="w-[1100px] flex-col  font-roboto">
           <div className="my-3 flex justify-between items-center w-full pb-5">
@@ -38,6 +66,14 @@ export const RootLayout = () => {
                 <HeroIcons name="CalendarIcon" className="h-6 w-6" stroke={2} />
                 <h1>Calendar</h1>
               </NavLink>
+
+              <button onClick={openModal}>
+                <HeroIcons
+                  name="AcademicCapIcon"
+                  className="h-6 w-6"
+                  stroke={2}
+                />
+              </button>
             </div>
 
             <button onClick={handleOpen}>

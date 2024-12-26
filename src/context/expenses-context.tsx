@@ -133,8 +133,6 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
         expense
       )
 
-      console.log(response)
-
       return response.data
     },
     onSuccess: (data) => {

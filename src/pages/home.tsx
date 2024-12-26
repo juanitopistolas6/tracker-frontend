@@ -131,7 +131,7 @@ export const HomePage = () => {
         <div className="flex gap-10">
           <div className="flex flex-col items-start text-gray-800">
             <div className="flex justify-between w-full text-sm font-semibold text-green-600">
-              <span>Income</span>
+              <span>Ingresos</span>
               <span></span>
             </div>
 
@@ -163,7 +163,7 @@ export const HomePage = () => {
             </div>
 
             <div className="text-3xl font-bold text-black">
-              {totalExpenses?.toLocaleString('en-US')}
+              {`$${totalExpenses?.toLocaleString('en-US')}`}
             </div>
           </div>
         </div>

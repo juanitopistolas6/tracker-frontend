@@ -4,16 +4,19 @@ import {
   ClickAwayListener,
   MenuList,
   MenuItem,
+  Tooltip,
 } from '@mui/material'
 import { HeroIcons, IconName } from '../util/hero-icons'
 import { lazy, Suspense, useRef, useState } from 'react'
 import { useModal } from '@/hooks/useModal'
 import { useExpense } from '@/context/expenses-context'
+import { Wait } from './backdrop'
 
 interface IExpenseType {
   id: string
   type: 'saving' | 'deposit' | 'expense'
   amount: number
+  status: 'pending' | 'success'
   description: string
 }
 
@@ -29,7 +32,7 @@ const iconMapping: Record<string, IconConfig> = {
 }
 
 export const ExpenseType = (expenseProps: IExpenseType) => {
-  const { amount, description, type, id } = expenseProps
+  const { amount, description, type, id, status } = expenseProps
   const { deleteExpense } = useExpense()
   const {
     handleClose: handleCloseModal,
@@ -66,7 +69,7 @@ export const ExpenseType = (expenseProps: IExpenseType) => {
 
   return (
     <>
-      <Suspense fallback={<div></div>}>
+      <Suspense fallback={<Wait />}>
         {openModal && (
           <Modal
             className="flex items-start top-1/2 transform -translate-y-1/2 justify-center w-full"
@@ -94,7 +97,16 @@ export const ExpenseType = (expenseProps: IExpenseType) => {
 
         <span className="flex-grow text-center">{description}</span>
 
-        <span className="font-bold right-0 w-24 text-right">{`${type == 'expense' ? '-' : ''}$${amount}`}</span>
+        <div className="font-bold right-0 w-24 text-right">
+          <div className="flex items-center justify-between ">
+            {status === 'pending' && (
+              <Tooltip title="pendiente" placement="top" arrow>
+                <HeroIcons name="ClockIcon" className="h-6 w-6" />
+              </Tooltip>
+            )}
+            <span className="flex-1">{`${type == 'expense' ? '-' : ''}$${amount}`}</span>
+          </div>
+        </div>
 
         <button
           className="absolute -right-10 rounded-full hover:bg-gray-200 my-auto flex items-center p-2 top-1/2 transform -translate-y-1/2"

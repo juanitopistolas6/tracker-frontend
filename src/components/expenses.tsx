@@ -46,7 +46,7 @@ export const Expenses = () => {
             className="font-bold rounded-xl hover:bg-gray-300 p-2"
             onClick={() => fetchNextPage()}
           >
-            Load more...
+            Cargar mas...
           </button>
         </div>
       )}

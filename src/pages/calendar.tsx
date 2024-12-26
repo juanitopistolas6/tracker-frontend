@@ -95,6 +95,7 @@ export const Calendar = () => {
     <div className="flex-col w-full h-full space-y-5">
       <div className="flex justify-center gap-3">
         <button
+          className="rounded-full hover:bg-gray-200 p-1 flex justify-center items-center"
           onClick={() => {
             handlePrevMonth()
           }}
@@ -102,9 +103,12 @@ export const Calendar = () => {
           <HeroIcons name="ChevronLeftIcon" />
         </button>
 
-        <span>{formatDateToMonthYear(currentDate)}</span>
+        <span className="w-36 text-center flex justify-center items-center">
+          {formatDateToMonthYear(currentDate)}
+        </span>
 
         <button
+          className="rounded-full hover:bg-gray-200 p-1 flex justify-center items-center"
           onClick={() => {
             handleNextMonth()
           }}

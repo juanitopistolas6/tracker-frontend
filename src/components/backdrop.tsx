@@ -1,9 +1,9 @@
 import { Backdrop, CircularProgress } from '@mui/material'
 
-export const Wait = ({ open }: { open: boolean }) => {
+export const Wait = () => {
   return (
     <Backdrop
-      open={open}
+      open={true}
       sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
     >
       <CircularProgress color="inherit" />
