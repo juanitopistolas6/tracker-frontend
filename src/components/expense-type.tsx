@@ -56,6 +56,11 @@ export const ExpenseType = (expenseProps: IExpenseType) => {
     setOpen(false)
   }
 
+  const handleMenuClick = (callback: () => void) => {
+    callback()
+    setOpen(false)
+  }
+
   function handleListKeyDown(event: React.KeyboardEvent) {
     if (event.key === 'Tab') {
       event.preventDefault()
@@ -72,7 +77,7 @@ export const ExpenseType = (expenseProps: IExpenseType) => {
       <Suspense fallback={<Wait />}>
         {openModal && (
           <Modal
-            className="flex items-start top-1/2 transform -translate-y-1/2 justify-center w-full"
+            className="flex items-start top-1/2 transform -translate-y-1/2 justify-center w-full h-max"
             closeModal={handleCloseModal}
             open
           >
@@ -101,7 +106,9 @@ export const ExpenseType = (expenseProps: IExpenseType) => {
           <div className="flex items-center justify-between ">
             {status === 'pending' && (
               <Tooltip title="pendiente" placement="top" arrow>
-                <HeroIcons name="ClockIcon" className="h-6 w-6" />
+                <div>
+                  <HeroIcons name="ClockIcon" className="h-6 w-6" />
+                </div>
               </Tooltip>
             )}
             <span className="flex-1">{`${type == 'expense' ? '-' : ''}$${amount}`}</span>
@@ -118,45 +125,48 @@ export const ExpenseType = (expenseProps: IExpenseType) => {
             className="text-black w-5 h-5"
             stroke={2}
           />
-          <Popper
-            open={open}
-            anchorEl={anchorRef.current}
-            role={undefined}
-            placement="right-start"
-            transition
-            disablePortal
-          >
-            {({ TransitionProps, placement }) => (
-              <Grow
-                {...TransitionProps}
-                style={{
-                  transformOrigin:
-                    placement === 'right-start' ? 'left' : 'left',
-                }}
-              >
-                <div className="mb-1 shadow-2xl rounded-xl w-[120px]">
-                  <ClickAwayListener onClickAway={handleClose}>
-                    <MenuList
-                      autoFocusItem={open}
-                      id="composition-menu"
-                      aria-labelledby="composition-button"
-                      onKeyDown={handleListKeyDown}
-                    >
-                      <MenuItem onClick={() => handleOpen()}>Editar</MenuItem>
-                      <MenuItem
-                        onClick={() => {
-                          deleteExpense(id)
-                        }}
-                      >
-                        Eliminar
-                      </MenuItem>
-                    </MenuList>
-                  </ClickAwayListener>
-                </div>
-              </Grow>
-            )}
-          </Popper>
         </button>
+
+        <Popper
+          open={open}
+          anchorEl={anchorRef.current}
+          role={undefined}
+          placement="right-start"
+          transition
+          disablePortal
+          style={{ zIndex: 1300 }}
+        >
+          {({ TransitionProps, placement }) => (
+            <Grow
+              {...TransitionProps}
+              style={{
+                transformOrigin: placement === 'right-start' ? 'left' : 'left',
+              }}
+            >
+              <div className="mb-1 shadow-2xl rounded-xl w-[120px] bg-white">
+                <ClickAwayListener onClickAway={handleClose}>
+                  <MenuList
+                    autoFocusItem={open}
+                    id="composition-menu"
+                    aria-labelledby="composition-button"
+                    onKeyDown={handleListKeyDown}
+                  >
+                    <MenuItem
+                      onClick={() => handleMenuClick(() => handleOpen())}
+                    >
+                      Editar
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => handleMenuClick(() => deleteExpense(id))}
+                    >
+                      Eliminar
+                    </MenuItem>
+                  </MenuList>
+                </ClickAwayListener>
+              </div>
+            </Grow>
+          )}
+        </Popper>
       </div>
     </>
   )

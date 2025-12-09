@@ -13,8 +13,24 @@ import {
 import { useExpense } from '@/context/expenses-context'
 import { IFilter } from '@/util/interfaces'
 import { lazy, Suspense, useMemo } from 'react'
+import { Wait } from '@/components/backdrop'
+import { Landing } from './landing'
 
 export const HomePage = () => {
+  const { isAuthenticated, isLoading } = useAuth()
+
+  if (isLoading) {
+    return <Wait />
+  }
+
+  if (!isAuthenticated) {
+    return <Landing />
+  }
+
+  return <AuthenticatedHomePage />
+}
+
+export const AuthenticatedHomePage = () => {
   const { handleClose, handleOpen, open } = useModal()
   const { stats } = useAuth()
   const { setFilter, expenses } = useExpense()
@@ -77,12 +93,12 @@ export const HomePage = () => {
 
   return (
     <>
-      <Suspense fallback={null}>
+      <Suspense fallback={<Wait />}>
         {open && (
           <Modal
             open={open}
             closeModal={handleClose}
-            className="flex items-start top-1/2 transform -translate-y-1/2 justify-center w-full"
+            className="flex items-start top-1/2 transform -translate-y-1/2 justify-center w-full h-full"
           >
             <ExpenseModal
               handleClose={handleClose}
@@ -106,7 +122,7 @@ export const HomePage = () => {
             </div>
 
             <div className="font-bold text-3xl">
-              {total.toLocaleString('en-US')}
+              {`$${total.toLocaleString('en-US')}`}
             </div>
           </div>
 

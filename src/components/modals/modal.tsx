@@ -57,7 +57,7 @@ const Modal = ({
           />
           <div
             className={cn(
-              'fixed inset-0 overflow-y-auto p-4',
+              'fixed inset-0 overflow-y-auto',
               className ?? 'flex items-center justify-center'
             )}
           >

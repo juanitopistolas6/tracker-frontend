@@ -11,6 +11,7 @@ export type expensePayload =
   | { action: 'GET_EXPENSES'; payload: IExpense[] }
   | { action: 'REPLACE_EXPENSE'; payload: IExpense }
   | { action: 'FETCH_ERROR' }
+  | { action: 'RESET_EXPENSES' }
 
 export function expenseReducer(
   state: IExpenseState,
@@ -38,6 +39,9 @@ export function expenseReducer(
     }
     case 'FETCH_ERROR': {
       return { ...state, error: true }
+    }
+    case 'RESET_EXPENSES': {
+      return { expenses: null, error: false }
     }
     default: {
       return state

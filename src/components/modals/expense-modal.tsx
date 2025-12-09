@@ -14,6 +14,8 @@ import { useAxios } from '@/hooks/useAxios'
 import { IExpense } from '@/util/interfaces'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
+import { useAuth } from '../../context/auth-context'
+import { toast } from 'react-toastify'
 
 interface ExpenseProps {
   action: 'edit' | 'create'
@@ -33,6 +35,7 @@ function ExpenseModal(props: ExpenseProps) {
   const { handleClose, action, id, defaultDate } = props
   const { axios } = useAxios()
   const { createExpense, editExpense } = useExpense()
+  const { stats } = useAuth()
 
   const { data: expense } = useQuery({
     enabled: action === 'edit',
@@ -57,6 +60,21 @@ function ExpenseModal(props: ExpenseProps) {
   const onSubmit = (data: formValues) => {
     if (!id && action == 'edit') return
 
+    // Validar que haya suficientes fondos para gastos
+    if (action === 'create' && data.type === 'expense') {
+      const currentBalance = stats?.data.balance ?? 0
+
+      if (data.amount > currentBalance) {
+        toast(
+          `No tienes suficientes fondos. Balance actual: $${currentBalance}, Gasto requerido: $${data.amount}`,
+          {
+            type: 'error',
+          }
+        )
+        return
+      }
+    }
+
     action === 'create'
       ? createExpense(data)
       : editExpense({ expense: data, id: id! })
@@ -73,8 +91,8 @@ function ExpenseModal(props: ExpenseProps) {
 
   return (
     <div className="w-[500px] h-full bg-white rounded-xl pt-3 space-y-5 flex-col">
-      <div className="flex justify-between px-3">
-        <button onClick={handleClose}>
+      <div className="flex justify-between px-3 ">
+        <button onClick={handleClose} className=" hover:bg-gray-300">
           <HeroIcons name="XMarkIcon" />
         </button>
       </div>

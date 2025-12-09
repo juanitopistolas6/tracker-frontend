@@ -3,7 +3,7 @@ import Cookies from 'js-cookie'
 
 export const useAxios = () => {
   const axios = Axios.create({
-    baseURL: 'http://localhost:3000',
+    baseURL: 'https://tracklist-backend-production.up.railway.app',
   })
 
   axios.interceptors.request.use(
@@ -17,7 +17,6 @@ export const useAxios = () => {
       return config
     },
     (error) => {
-      console.log('no se ha podido')
       return Promise.reject(error)
     }
   )

@@ -8,6 +8,7 @@ import {
   UseMutateFunction,
   useMutation,
   useQuery,
+  useQueryClient,
 } from '@tanstack/react-query'
 import {
   createContext,
@@ -23,11 +24,13 @@ import {
   ICreateExpense,
   IExpense,
   IFilter,
+  IRegister,
   IResponse,
 } from '../util/interfaces'
 import { IExpensePaginated } from '../util/interfaces/expense-paginated'
 import { expenseReducer, IExpenseState } from '../hooks/expense-reducer'
 import { useAuth } from './auth-context'
+import { toast, TypeOptions } from 'react-toastify'
 
 interface IExpenseValues {
   state: IExpenseState
@@ -50,6 +53,7 @@ interface IExpenseValues {
     ICreateExpense,
     unknown
   >
+
   getExpenseByDate: (
     options?: RefetchOptions
   ) => Promise<QueryObserverResult<IResponse<IExpense[]>, Error>>
@@ -74,13 +78,23 @@ const expenseContext = createContext<IExpenseValues | null>(null)
 export function ExpenseProvider({ children }: { children: ReactNode }) {
   const { axios } = useAxios()
   const { isAuthenticated, refetchStats } = useAuth()
+  const queryClient = useQueryClient()
   const [filter, setFilter] = useState<IFilter>('todos')
   const [state, dispatch] = useReducer(expenseReducer, {
     expenses: [],
     error: false,
   })
 
-  const { data, hasNextPage, fetchNextPage } = useInfiniteQuery({
+  const notify = (message: string, type: TypeOptions) => {
+    toast(message, { type })
+  }
+
+  const {
+    data,
+    hasNextPage,
+    fetchNextPage,
+    refetch: refetchExpenses,
+  } = useInfiniteQuery({
     enabled: isAuthenticated,
     queryKey: ['expenses'],
     initialPageParam: 1,
@@ -142,8 +156,24 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
 
       dispatch({ action: 'ADD_EXPENSE', payload: expense })
       refetchStats()
+      queryClient.invalidateQueries({ queryKey: ['expense-day'] })
+
+      // Notificar según el tipo
+      const typeMessages = {
+        expense: 'Gasto creado exitosamente',
+        deposit: 'Depósito creado exitosamente',
+        saving: 'Ahorro creado exitosamente',
+      }
+
+      notify(
+        typeMessages[expense.type as keyof typeof typeMessages] ||
+          'Acción creada exitosamente',
+        'success'
+      )
     },
     onError: () => {
+      notify('Error al añadir nuevo gasto', 'error')
+
       dispatch({ action: 'FETCH_ERROR' })
     },
   })
@@ -170,8 +200,12 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
 
       dispatch({ action: 'REPLACE_EXPENSE', payload: expense })
       refetchStats()
+      queryClient.invalidateQueries({ queryKey: ['expense-day'] })
+      notify('Acción actualizada exitosamente', 'success')
     },
     onError: () => {
+      notify('Error al editar el gasto', 'error')
+
       dispatch({ action: 'FETCH_ERROR' })
     },
   })
@@ -192,9 +226,14 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
 
       dispatch({ action: 'REMOVE_EXPENSE', payload: expense })
       refetchStats()
+      queryClient.invalidateQueries({ queryKey: ['expense-day'] })
+      notify('Acción eliminada exitosamente', 'success')
     },
     onError: (data) => {
       console.log(data.message)
+
+      notify('Error al remover el gasto', 'error')
+
       dispatch({ action: 'FETCH_ERROR' })
     },
   })
@@ -209,6 +248,14 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
       payload: data.pages[lastPage].data.expenses,
     })
   }, [data])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      refetchExpenses()
+    } else {
+      dispatch({ action: 'RESET_EXPENSES' })
+    }
+  }, [isAuthenticated, refetchExpenses])
 
   const expenses: IExpense[] | null | undefined = useMemo(() => {
     if (filter === 'todos') return state.expenses
