@@ -31,7 +31,6 @@ interface IAuthValues {
   isAuthenticated: boolean
   isLoading: boolean
   loginSuccess: boolean
-  error: string | null
   registerUser: UseMutateFunction<any, Error, IRegister, unknown>
   logout: () => void
   login: UseMutateFunction<
@@ -205,7 +204,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     stats,
     isAuthenticated,
     isLoading,
-    error,
     loginSuccess,
     login,
     logout,

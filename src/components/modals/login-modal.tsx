@@ -15,7 +15,7 @@ interface form {
 
 const LoginModal = (loginProps: loginProps) => {
   const { handleClose, openRegister } = loginProps
-  const { login, isLoading, error } = useAuth()
+  const { login, isLoading } = useAuth()
   const {
     register,
     handleSubmit,
@@ -56,16 +56,6 @@ const LoginModal = (loginProps: loginProps) => {
             Bienvenido de vuelta a tu gestor de gastos
           </p>
         </div>
-
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-            <HeroIcons
-              name="ExclamationTriangleIcon"
-              className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"
-            />
-            <span className="text-red-700 text-sm">{error}</span>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit(submit)} className="space-y-4">
           {/* Usuario */}
