@@ -51,7 +51,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { axios } = useAxios()
   const [user, setUser] = useState<IUser | null>(null)
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false)
-  const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const queryClient = useQueryClient()
 

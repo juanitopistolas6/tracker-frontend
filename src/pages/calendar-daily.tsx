@@ -34,8 +34,6 @@ export const CalendarDaily = () => {
     return hours
   }, [expenses])
 
-  const colorArrays = ['green', 'red', 'blue', 'pink']
-
   return (
     <div className="flex-col w-full h-5/6 border rounded-xl overflow-y-auto space-y-8 p-5">
       <div className="flex-col space-y-1 border-b">

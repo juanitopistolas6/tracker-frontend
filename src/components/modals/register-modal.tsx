@@ -9,7 +9,6 @@ const RegisterForm = () => {
   const {
     control,
     register,
-    getValues,
     handleSubmit,
     watch,
     formState: { errors },

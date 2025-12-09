@@ -24,7 +24,6 @@ import {
   ICreateExpense,
   IExpense,
   IFilter,
-  IRegister,
   IResponse,
 } from '../util/interfaces'
 import { IExpensePaginated } from '../util/interfaces/expense-paginated'
