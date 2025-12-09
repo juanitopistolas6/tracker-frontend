@@ -36,19 +36,6 @@ export const CalendarDaily = () => {
 
   const colorArrays = ['green', 'red', 'blue', 'pink']
 
-  function getRandomColor(array: string[]) {
-    if (array.length === 0) {
-      return null
-    }
-
-    const randomIndex = Math.floor(Math.random() * colorArrays.length)
-    const color = colorArrays[randomIndex]
-
-    colorArrays.splice(randomIndex, 1)
-
-    return color
-  }
-
   return (
     <div className="flex-col w-full h-5/6 border rounded-xl overflow-y-auto space-y-8 p-5">
       <div className="flex-col space-y-1 border-b">
